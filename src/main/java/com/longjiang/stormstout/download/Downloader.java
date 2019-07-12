@@ -1,5 +1,7 @@
 package com.longjiang.stormstout.download;
 
+import java.util.List;
+
 /**
  * @Author:longjiang
  * @date:下午2:29 2019/7/10
@@ -9,5 +11,7 @@ package com.longjiang.stormstout.download;
 public interface Downloader {
 
     String download(String url);
+
+    // todo 设置代理,设置headers
 
 }
