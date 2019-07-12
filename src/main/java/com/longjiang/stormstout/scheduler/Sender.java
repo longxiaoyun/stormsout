@@ -56,7 +56,7 @@ public class Sender implements RabbitTemplate.ConfirmCallback, RabbitTemplate.Re
         logger.debug("开始发送消息 : " + msg.toLowerCase());
 //        String response = rabbitTemplate.convertSendAndReceive("stormsout-mq-exchange", "for_url_queue", msg, correlationId).toString();
 
-        rabbitTemplate.convertAndSend("stormsout-mq-exchange", "for_url_queue", msg,correlationId);
+        this.rabbitTemplate.convertAndSend("stormsout-mq-exchange", "for_url_queue", msg,correlationId);
 
         logger.debug("结束发送消息 : " + msg.toLowerCase());
 //        logger.debug("消费者响应 : " + response + " 消息处理完成");

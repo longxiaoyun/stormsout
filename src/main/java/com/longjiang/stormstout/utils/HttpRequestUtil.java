@@ -119,7 +119,7 @@ public class HttpRequestUtil {
      * @param timeout 超时时间
      * @return
      */
-    public String httpGet(String url, Integer timeout) {
+    public static String httpGet(String url, Integer timeout) {
         String msg = "-1";
 
         // 获取客户端连接对象

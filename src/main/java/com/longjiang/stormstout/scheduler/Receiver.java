@@ -19,5 +19,6 @@ public class Receiver {
     @RabbitListener(queues = "url_queue")
     public void processMessageUrl(String msg) {
         System.out.println(Thread.currentThread().getName() + " 接收到来自url_queue队列的消息：" + msg);
+
     }
 }
