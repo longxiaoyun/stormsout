@@ -3,6 +3,9 @@ package com.longjiang.stormstout.utils;
 import java.io.IOException;
 import java.io.InterruptedIOException;
 import java.net.UnknownHostException;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import javax.net.ssl.SSLException;
 import javax.net.ssl.SSLHandshakeException;
@@ -121,11 +124,22 @@ public class HttpRequestUtil {
      */
     public static String httpGet(String url, Integer timeout) {
         String msg = "-1";
+        List<String> useragents= Arrays.asList(
+                "Mozilla/5.0 (compatible; Googlebot/2.1; +http://www.google.com/bot.html)",
+                "Mozilla/5.0 (compatible; Baiduspider/2.0; +http://www.baidu.com/search/spider.html)",
+                "Mozilla/5.0 (compatible; Baiduspider-render/2.0; +http://www.baidu.com/search/spider.html)",
+                "Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; Trident/5.0);",
+                "Sosospider+(+http://help.soso.com/webspider.htm)",
+                "Sogou web spider/4.0(+http://www.sogou.com/docs/help/webmasters.htm#07)",
+                "Mozilla/5.0 (compatible; Yahoo! Slurp China; http://misc.yahoo.com.cn/help.html)");
 
+        Collections.shuffle(useragents);
         // 获取客户端连接对象
         CloseableHttpClient httpClient = getHttpClient(timeout);
         // 创建GET请求对象
         HttpGet httpGet = new HttpGet(url);
+
+        httpGet.setHeader("User-Agent",useragents.get(0));
 
         CloseableHttpResponse response = null;
 
@@ -137,22 +151,18 @@ public class HttpRequestUtil {
             // 获取响应信息
             msg = EntityUtils.toString(entity, "UTF-8");
         } catch (ClientProtocolException e) {
-            logger.error("协议错误");
-            e.printStackTrace();
+            logger.error("协议错误"+e);
         } catch (ParseException e) {
-            logger.error("解析错误");
-            e.printStackTrace();
+            logger.error("解析错误"+e);
         } catch (IOException e) {
-            logger.error("IO错误");
-            e.printStackTrace();
+            logger.error("IO错误"+e);
         } finally {
             if (null != response) {
                 try {
                     EntityUtils.consume(response.getEntity());
                     response.close();
                 } catch (IOException e) {
-                    logger.error("释放链接错误");
-                    e.printStackTrace();
+                    logger.error("释放链接错误"+e);
                 }
             }
         }

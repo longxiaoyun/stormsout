@@ -52,25 +52,23 @@ public class Engine {
         spider.getRequests().addAll(requests);
         scheduler.addRequests(requests);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(4);
+        ExecutorService executorService = Executors.newFixedThreadPool(6);
 
         while (scheduler.hasRequest()) {
             Request request = scheduler.nextRequest();
             executorService.execute(new Downloader(scheduler,request));
         }
-
         executorService.shutdown();
         executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 
-
         // 开始消费
-        this.consumer();
+//        this.consumer();
 
     }
 
 
 
-    public void consumer() {
+    public void consumer() throws InterruptedException {
 
         while (scheduler.hasResponse()) {
             Response response=scheduler.nextResponse();
@@ -81,13 +79,23 @@ public class Engine {
 
             logger.info("提取的url:"+urls);
 
-            List<Request> requests = urls.stream().map(spider::makeRequest).collect(Collectors.toList());
-            spider.getRequests().addAll(requests);
-
             String title=doc.select("title").text();
 
             logger.info("title:"+title);
 
+            // todo 调用pipeline处理
+
+            List<Request> requests = urls.stream().map(spider::makeRequest).collect(Collectors.toList());
+
+            if (!requests.isEmpty()) {
+                requests.forEach(scheduler::addRequest);
+            }
+
+            // todo 这里需要修改一下，消费者和生产者之家，可能要有观察者来监听队列
+            if (scheduler.hasRequest()) {
+                logger.info("request队列不为空");
+                this.producer();
+            }
 
         }
 
@@ -95,7 +103,7 @@ public class Engine {
 
 
     private void save() {
-        // todo etl save ...
+        // todo pipeline处理
     }
 
 

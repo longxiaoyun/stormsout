@@ -2,6 +2,9 @@ package com.longjiang.stormstout;
 
 import com.longjiang.stormstout.engine.Engine;
 import com.longjiang.stormstout.spider.Spider;
+import jdk.nashorn.internal.runtime.logging.Logger;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,10 +19,26 @@ public class GeneralSpider extends Spider {
 
     // 启动入口方法
     private void start_requests() {
-        List<String> urls=new ArrayList<>();
-        urls.add("http://www.baidu.com");
-        urls.add("http://www.hao123.com");
-        this.startUrls.addAll(urls);
+//        Spider spider=new Spider() {
+//            @Override
+//            protected <T> List<T> parse(String response) {
+//                return null;
+//            }
+//
+//            @Override
+//            public List<String> getStartUrls() {
+//                List<String> urls=new ArrayList<>();
+//                urls.add("https://www.baidu.com");
+//                urls.add("https://www.hao123.com");
+//                return urls;
+//            }
+//        };
+//        Engine engine=new Engine(spider);
+//        try {
+//            engine.producer();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
     }
 

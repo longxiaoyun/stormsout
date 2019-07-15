@@ -39,15 +39,16 @@ public class StormstoutApplicationTests {
             @Override
             public List<String> getStartUrls() {
                 List<String> urls=new ArrayList<>();
-                urls.add("http://www.baidu.com");
-                urls.add("http://www.hao123.com");
+                urls.add("https://www.baidu.com");
+                urls.add("https://www.hao123.com");
                 return urls;
             }
         };
         Engine engine=new Engine(spider);
         engine.producer();
 
-//        engine.consumer();
+        // 开始消费
+        engine.consumer();
     }
 
 
