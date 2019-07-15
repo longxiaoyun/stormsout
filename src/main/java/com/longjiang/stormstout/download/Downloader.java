@@ -1,6 +1,12 @@
 package com.longjiang.stormstout.download;
 
-import java.util.List;
+import com.longjiang.stormstout.request.Request;
+import com.longjiang.stormstout.response.Response;
+import com.longjiang.stormstout.scheduler.Scheduler;
+import com.longjiang.stormstout.utils.HttpRequestUtil;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * @Author:longjiang
@@ -8,10 +14,32 @@ import java.util.List;
  * @Description: 下载器
  * 负责下载网页，并把下载的内容传给pipeline进行后续保存处理
  **/
-public interface Downloader {
+public class Downloader implements Runnable {
 
-    String download(String url);
+    private Logger logger= LoggerFactory.getLogger(Downloader.class);
 
-    // todo 设置代理,设置headers
+    private Scheduler scheduler;
+
+    private Request request;
+
+    public Downloader(Scheduler scheduler,Request request) {
+        this.scheduler = scheduler;
+        this.request=request;
+    }
+
+    @Override
+    public void run() {
+        logger.info("开始处理:"+request.getUrl());
+
+        String content=HttpRequestUtil.httpGet(request.getUrl(),6000);
+
+        logger.debug("下载完毕", request.getUrl());
+
+        Response response = new Response(content,request);
+        scheduler.addResponse(response);
+
+    }
+
+
 
 }

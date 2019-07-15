@@ -1,6 +1,7 @@
 package com.longjiang.stormstout.parser;
 
-import java.util.List;
+import com.longjiang.stormstout.response.Result;
+import com.longjiang.stormstout.response.Response;
 
 /**
  * @Author:longjiang
@@ -10,9 +11,8 @@ import java.util.List;
  * 解析出的网页内容传给pipeline进行存储等后续操作
  **/
 
-public interface Parser {
+public interface Parser<T> {
 
-    List<String> fetchUrl(String content);
-
+    Result<T> parse(Response response);
 
 }

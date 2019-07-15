@@ -1,42 +1,44 @@
 package com.longjiang.stormstout.spider;
 
-import com.longjiang.stormstout.download.Downloader;
 import com.longjiang.stormstout.parser.Parser;
-import com.longjiang.stormstout.pipeline.StoresPipeline;
-import org.jsoup.Jsoup;
-import org.jsoup.helper.StringUtil;
-import org.jsoup.nodes.Document;
-import org.springframework.stereotype.Service;
+import com.longjiang.stormstout.request.Request;
+import com.longjiang.stormstout.response.Response;
+import lombok.Data;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * @Author:longjiang
  * @date:下午5:53 2019/7/12
  * @Description:
  **/
-@Service
-public class Spider implements Downloader,Parser,StoresPipeline {
+@Data
+public abstract class Spider {
 
-    @Override
-    public String download(String url) {
-        return null;
+    protected List<String>   startUrls = new ArrayList<>();
+    protected List<Request>  requests  = new ArrayList<>();
+
+
+    public Spider startUrls(String... urls) {
+        this.startUrls.addAll(Arrays.asList(urls));
+        return this;
     }
 
-    @Override
-    public List<String> fetchUrl(String content) {
-        if (StringUtil.isBlank(content)) {
-            // todo 错误处理
-        }
-        Document doc = Jsoup.parse(content);
-
-        return doc.select("a").parallelStream().map(link -> link.attr("abs:href")).filter(link -> !link.trim().equals("")).collect(Collectors.toList());
+    /**
+     * 构建一个Request
+     */
+    public <T> Request<T> makeRequest(String url) {
+        return new Request<>(url);
     }
 
-    @Override
-    public Object storeToTarget(String result) {
-        return null;
-    }
+
+
+    /**
+     * 解析 DOM
+     */
+    protected abstract <T> List<T> parse(String response);
+
 
 }
