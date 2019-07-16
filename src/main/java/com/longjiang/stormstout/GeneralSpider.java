@@ -19,26 +19,26 @@ public class GeneralSpider extends Spider {
 
     // 启动入口方法
     private void start_requests() {
-//        Spider spider=new Spider() {
-//            @Override
-//            protected <T> List<T> parse(String response) {
-//                return null;
-//            }
-//
-//            @Override
-//            public List<String> getStartUrls() {
-//                List<String> urls=new ArrayList<>();
-//                urls.add("https://www.baidu.com");
-//                urls.add("https://www.hao123.com");
-//                return urls;
-//            }
-//        };
-//        Engine engine=new Engine(spider);
-//        try {
-//            engine.producer();
-//        } catch (InterruptedException e) {
-//            e.printStackTrace();
-//        }
+        Spider spider=new Spider() {
+            @Override
+            protected <T> List<T> parse(String response) {
+                return null;
+            }
+
+            @Override
+            public List<String> getStartUrls() {
+                List<String> urls=new ArrayList<>();
+                urls.add("https://www.baidu.com");
+                urls.add("https://www.hao123.com");
+                return urls;
+            }
+        };
+        Engine engine=new Engine(spider);
+        try {
+            engine.producer();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
 
     }
 

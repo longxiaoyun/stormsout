@@ -17,6 +17,7 @@ import org.apache.http.NoHttpResponseException;
 import org.apache.http.ParseException;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpRequestRetryHandler;
+import org.apache.http.client.config.CookieSpecs;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -69,6 +70,7 @@ public class HttpRequestUtil {
                 .setConnectTimeout(timeOut)
                 // 响应超时时间
                 .setSocketTimeout(timeOut)
+                .setCookieSpec(CookieSpecs.IGNORE_COOKIES)
                 .build();
 
         /**
@@ -134,6 +136,7 @@ public class HttpRequestUtil {
                 "Mozilla/5.0 (compatible; Yahoo! Slurp China; http://misc.yahoo.com.cn/help.html)");
 
         Collections.shuffle(useragents);
+
         // 获取客户端连接对象
         CloseableHttpClient httpClient = getHttpClient(timeout);
         // 创建GET请求对象

@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @Author:longjiang
@@ -20,6 +22,17 @@ public class Scheduler {
 
     private BlockingQueue<Response> responseQueue  = new LinkedBlockingQueue<>();
     private BlockingQueue<Request> requestQueue = new LinkedBlockingQueue<>();
+
+    // 请求过滤条件
+    private String regex=".*";
+
+    private BloomFilter bloomFilter;
+
+    public Scheduler() {
+        this.bloomFilter=new BloomFilter();
+    }
+
+
 
     public void addResponse(Response response) {
         try {
@@ -35,7 +48,10 @@ public class Scheduler {
 
     public Response nextResponse() {
         try {
-            return responseQueue.poll(10,TimeUnit.SECONDS);
+            Response response= responseQueue.poll(10,TimeUnit.SECONDS);
+            // 添加到布隆过滤器，表示该url已经爬取过不在重复爬取
+            bloomFilter.add(response.getRequest().getUrl());
+            return response;
         } catch (InterruptedException e) {
             logger.error("从调度器获取 Response 出错", e);
             return null;
@@ -66,7 +82,15 @@ public class Scheduler {
     }
 
     public void addRequests(List<Request> requests) {
-        requests.forEach(this::addRequest);
+
+        Pattern p = Pattern.compile(regex);
+        // 添加到request队列，并判断是否已经爬取过了，爬取过的就不再添加
+        // 再过滤掉预设值的，rule  ，意思是只爬取特定的url
+        requests.stream()
+                .filter(req -> !bloomFilter.contain(req.getUrl()))
+                .filter(r -> p.matcher(r.getUrl()).matches())
+                .forEach(this::addRequest);
+
     }
 
 

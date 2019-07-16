@@ -14,7 +14,8 @@ import org.slf4j.LoggerFactory;
  * @Description: 下载器
  * 负责下载网页，并把下载的内容传给pipeline进行后续保存处理
  **/
-public class Downloader implements Runnable {
+//public class Downloader implements Runnable {
+public class Downloader {
 
     private Logger logger= LoggerFactory.getLogger(Downloader.class);
 
@@ -27,8 +28,22 @@ public class Downloader implements Runnable {
         this.request=request;
     }
 
-    @Override
-    public void run() {
+//    @Override
+//    public void run() {
+//        logger.info("开始处理:"+request.getUrl());
+//
+//        String content=HttpRequestUtil.httpGet(request.getUrl(),6000);
+//
+//        logger.debug("下载完毕", request.getUrl());
+//
+//        Response response = new Response(content,request);
+//
+//        scheduler.addResponse(response);
+//
+//    }
+
+
+    public void download() {
         logger.info("开始处理:"+request.getUrl());
 
         String content=HttpRequestUtil.httpGet(request.getUrl(),6000);
@@ -36,9 +51,11 @@ public class Downloader implements Runnable {
         logger.debug("下载完毕", request.getUrl());
 
         Response response = new Response(content,request);
+
         scheduler.addResponse(response);
 
     }
+
 
 
 

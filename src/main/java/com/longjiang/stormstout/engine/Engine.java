@@ -52,17 +52,18 @@ public class Engine {
         spider.getRequests().addAll(requests);
         scheduler.addRequests(requests);
 
-        ExecutorService executorService = Executors.newFixedThreadPool(6);
+        Request request = scheduler.nextRequest();
+        new Downloader(scheduler,request).download();
 
-        while (scheduler.hasRequest()) {
-            Request request = scheduler.nextRequest();
-            executorService.execute(new Downloader(scheduler,request));
-        }
-        executorService.shutdown();
-        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
+//        ExecutorService executorService = Executors.newFixedThreadPool(6);
+//
+//        while (scheduler.hasRequest()) {
+//            Request request = scheduler.nextRequest();
+//            executorService.execute(new Downloader(scheduler,request));
+//        }
+//        executorService.shutdown();
+//        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
 
-        // 开始消费
-//        this.consumer();
 
     }
 
@@ -75,6 +76,7 @@ public class Engine {
             logger.info("准备处理response:"+response);
 
             Document doc = Jsoup.parse(response.getBody());
+
             List<String> urls=doc.select("a").parallelStream().map(link -> link.attr("abs:href")).filter(link -> !link.trim().equals("")).collect(Collectors.toList());
 
             logger.info("提取的url:"+urls);
