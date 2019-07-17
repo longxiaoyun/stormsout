@@ -7,6 +7,8 @@ import com.longjiang.stormstout.response.Response;
 import com.longjiang.stormstout.response.Result;
 import com.longjiang.stormstout.scheduler.Scheduler;
 import com.longjiang.stormstout.spider.Spider;
+import com.longjiang.stormstout.utils.ExecutorTaskUtil;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
@@ -23,19 +25,12 @@ import java.util.stream.Collectors;
  * @date:上午11:30 2019/7/15
  * @Description:
  **/
+@Slf4j
 public class Engine {
-
-
-    private Logger logger= LoggerFactory.getLogger(Engine.class);
-
 
     private Scheduler scheduler;
 
-    private ExecutorService executorService;
-
     private Spider spider;
-
-
 
     // 构造方法，注入spider
     public Engine (Spider spider) {
@@ -47,24 +42,16 @@ public class Engine {
     public void producer() throws InterruptedException {
 
         List<Request> requests = spider.getStartUrls().stream().map(spider::makeRequest).collect(Collectors.toList());
-        logger.info("requests:"+requests);
+        log.info("requests:"+requests);
 
         spider.getRequests().addAll(requests);
         scheduler.addRequests(requests);
 
-        Request request = scheduler.nextRequest();
-        new Downloader(scheduler,request).download();
-
-//        ExecutorService executorService = Executors.newFixedThreadPool(6);
-//
-//        while (scheduler.hasRequest()) {
-//            Request request = scheduler.nextRequest();
-//            executorService.execute(new Downloader(scheduler,request));
-//        }
-//        executorService.shutdown();
-//        executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.DAYS);
-
-
+        while (scheduler.hasRequest()) {
+            Request request = scheduler.nextRequest();
+            ExecutorTaskUtil.getInstance().execute(new Downloader(scheduler,request));
+        }
+        ExecutorTaskUtil.close();
     }
 
 
@@ -73,17 +60,17 @@ public class Engine {
 
         while (scheduler.hasResponse()) {
             Response response=scheduler.nextResponse();
-            logger.info("准备处理response:"+response);
+            log.info("准备处理response:"+response);
 
             Document doc = Jsoup.parse(response.getBody());
 
             List<String> urls=doc.select("a").parallelStream().map(link -> link.attr("abs:href")).filter(link -> !link.trim().equals("")).collect(Collectors.toList());
 
-            logger.info("提取的url:"+urls);
+            log.info("提取的url:"+urls);
 
             String title=doc.select("title").text();
 
-            logger.info("title:"+title);
+            log.info("title:"+title);
 
             // todo 调用pipeline处理
 
@@ -95,7 +82,7 @@ public class Engine {
 
             // todo 这里需要修改一下，消费者和生产者之家，可能要有观察者来监听队列
             if (scheduler.hasRequest()) {
-                logger.info("request队列不为空");
+                log.info("request队列不为空");
                 this.producer();
             }
 
