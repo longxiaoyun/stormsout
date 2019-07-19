@@ -1,13 +1,10 @@
 package com.longjiang.stormstout;
 
-import com.longjiang.stormstout.engine.Engine;
-import com.longjiang.stormstout.spider.Spider;
-import jdk.nashorn.internal.runtime.logging.Logger;
-import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.longjiang.stormstout.spider.Spider;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 
 /**
  * @Author:longjiang
@@ -16,39 +13,34 @@ import java.util.List;
  **/
 public class GeneralSpider extends Spider {
 
+    private Logger logger= LoggerFactory.getLogger(GeneralSpider.class);
 
-    // 启动入口方法
-    private void start_requests() {
-        Spider spider=new Spider() {
-            @Override
-            protected <T> List<T> parse(String response) {
-                return null;
-            }
 
-            @Override
-            public List<String> getStartUrls() {
-                List<String> urls=new ArrayList<>();
-                urls.add("https://www.baidu.com");
-                urls.add("https://www.hao123.com");
-                return urls;
-            }
-        };
-        Engine engine=new Engine(spider);
-        try {
-            engine.producer();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+    // 启动入口
+    public static void main(String[] args) throws InterruptedException {
+
+        Spider spider=new Spider();
+        spider.addUrl("http://www.hao123.com/");
+
+        // 下载
+        spider.crawler();
+
+        // 页面分析
+        spider.analyzer();
 
     }
 
-    @Override
-    protected <T> List<T> parse(String response) {
-        return null;
-    }
 
 
-    public static void main(String[] args) {
-       new GeneralSpider().start_requests();
-    }
+
+
+
+
+
+
+
+
+
+
+
 }

@@ -27,20 +27,6 @@ public class Downloader implements Runnable {
         this.request = request;
     }
 
-//    @Override
-//    public void run() {
-//        logger.info("开始处理:"+request.getUrl());
-//
-//        String content=HttpRequestUtil.httpGet(request.getUrl(),6000);
-//
-//        logger.debug("下载完毕", request.getUrl());
-//
-//        Response response = new Response(content,request);
-//
-//        scheduler.addResponse(response);
-//
-//    }
-
 
     public void download() {
         logger.info("开始处理:" + request.getUrl());

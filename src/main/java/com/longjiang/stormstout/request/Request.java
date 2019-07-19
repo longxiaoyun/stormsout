@@ -1,5 +1,6 @@
 package com.longjiang.stormstout.request;
 
+import com.longjiang.stormstout.parser.Parser;
 import lombok.Getter;
 
 /**
@@ -22,13 +23,13 @@ public class Request<T> {
 
 
     // request请求完了后的回调函数
-//    private  parser;
+    private Parser parser;
 
 
 
     public Request(String url) {
         this.url=url;
-//        this.parser=parser;
+        this.parser=parser;
     }
 
 

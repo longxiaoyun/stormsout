@@ -13,14 +13,11 @@ import java.util.List;
  * @Description:
  **/
 @Data
-//@NoArgsConstructor
+@NoArgsConstructor
 public class Result<T> {
     private List<Request> requests = new ArrayList<>();
     private T item;
 
-    public Result(T item) {
-        this.item = item;
-    }
 
     public Result addRequest(Request request) {
         this.requests.add(request);
