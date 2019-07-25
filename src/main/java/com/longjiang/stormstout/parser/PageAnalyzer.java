@@ -1,8 +1,10 @@
 package com.longjiang.stormstout.parser;
 
+import com.longjiang.stormstout.download.Downloader;
 import com.longjiang.stormstout.request.Request;
 import com.longjiang.stormstout.scheduler.SchdulerQueue;
 import com.longjiang.stormstout.spider.CrawlerSpider;
+import com.longjiang.stormstout.utils.ExecutorTaskUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
@@ -48,6 +50,7 @@ public class PageAnalyzer implements Runnable {
 
         urls.stream().filter(u -> !StringUtil.isBlank(u)).forEach(url -> {
             schdulerQueue.addRequest(new Request(url,headers,proxy));
+            ExecutorTaskUtil.getInstance().execute(new Downloader(schdulerQueue));
         });
 
         logger.info("---------"+schdulerQueue.hasRequest());
