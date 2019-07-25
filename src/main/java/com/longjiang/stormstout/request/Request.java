@@ -1,38 +1,26 @@
 package com.longjiang.stormstout.request;
 
-import com.longjiang.stormstout.parser.Parser;
-import lombok.Getter;
+import lombok.Data;
+
+import java.util.Map;
 
 /**
  * @Author:longjiang
- * @date:上午10:24 2019/7/15
+ * @date:下午6:03 2019/7/24
  * @Description:
  **/
-@Getter
-public class Request<T> {
+@Data
+public class Request {
     private String url;
 
-//    private Object headers;
-//
-//    private Object proxy;
-//
-//    private Object meta;
-//
-//    private Object cookies;
+    private Map<String,Object> headers;
 
+    private String proxy;
 
-
-    // request请求完了后的回调函数
-    private Parser parser;
-
-
-
-    public Request(String url) {
+    // 实现构造方法
+    public Request(String url,Map<String,Object>  headers,String proxy) {
         this.url=url;
-        this.parser=parser;
+        this.headers=headers;
+        this.proxy=proxy;
     }
-
-
-
-
 }
