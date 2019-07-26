@@ -1,10 +1,16 @@
 package com.longjiang.stormstout.scheduler;
 
+
+
+import com.google.common.base.Charsets;
+import com.google.common.hash.BloomFilter;
+import com.google.common.hash.Funnel;
+import com.google.common.hash.Funnels;
+import com.google.common.hash.Sink;
 import com.longjiang.stormstout.request.Request;
+import org.jsoup.nodes.Document;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
@@ -19,11 +25,17 @@ public class SchdulerQueue {
 
 
     private BlockingQueue<Request> requestQueue = new LinkedBlockingQueue<>();
-    private BlockingQueue<String> responseQueue=new LinkedBlockingQueue<>();
+//    private BlockingQueue<String> responseQueue=new LinkedBlockingQueue<>();
+    private BlockingQueue<Document> responseQueue=new LinkedBlockingQueue<>();
+
 
     public void addRequest(Request request) {
         try {
-            this.requestQueue.put(request);
+            if (!filter(request.getUrl())) {
+                this.requestQueue.put(request);
+            }else {
+                logger.info("url已爬取!");
+            }
         } catch (InterruptedException e) {
             System.out.println("向调度器添加 Request 出错"+e);
         }
@@ -56,7 +68,7 @@ public class SchdulerQueue {
 
 
 
-    public void addResponse(String response){
+    public void addResponse(Document response){
         try {
             this.responseQueue.put(response);
         } catch (InterruptedException e) {
@@ -64,7 +76,7 @@ public class SchdulerQueue {
         }
     }
 
-    public String getResponse(){
+    public Document getResponse(){
         try {
             return responseQueue.take();
         } catch (InterruptedException e) {
@@ -76,6 +88,30 @@ public class SchdulerQueue {
     public boolean hasResponse() {
         return responseQueue.size()>0;
     }
+
+
+
+    private boolean filter(String url) {
+        // expectedInsertions 预期插入的数据量
+        int expectedInsertions=100000;
+        // falsePositionProbability 预期的误报率
+        double falsePositionProbability=0.1;
+        BloomFilter<String> bloomFilter = BloomFilter.create(new Funnel<String>() {
+            @Override
+            public void funnel(String s, Sink sink) {
+                sink.putString(s, Charsets.UTF_8);
+            }
+        },expectedInsertions,falsePositionProbability);
+
+        if (bloomFilter.mightContain(url)){
+            return true;
+        }else {
+            bloomFilter.put(url);
+            return false;
+        }
+
+    }
+
 
 
 }

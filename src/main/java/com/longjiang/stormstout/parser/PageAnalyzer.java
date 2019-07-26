@@ -1,6 +1,8 @@
 package com.longjiang.stormstout.parser;
 
 import com.longjiang.stormstout.download.Downloader;
+import com.longjiang.stormstout.pipeline.FileStorePipeline;
+import com.longjiang.stormstout.pipeline.PageInfoBean;
 import com.longjiang.stormstout.request.Request;
 import com.longjiang.stormstout.scheduler.SchdulerQueue;
 import com.longjiang.stormstout.spider.CrawlerSpider;
@@ -8,9 +10,12 @@ import com.longjiang.stormstout.utils.ExecutorTaskUtil;
 import org.jsoup.Jsoup;
 import org.jsoup.helper.StringUtil;
 import org.jsoup.nodes.Document;
+import org.jsoup.select.Elements;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,12 +38,39 @@ public class PageAnalyzer implements Runnable {
 
     @Override
     public void run() {
-        String response=schdulerQueue.getResponse();
+        Document response=schdulerQueue.getResponse();
 
-        Document doc = Jsoup.parse(response);
+        Document doc = Jsoup.parse(response.html());
 
-        String title=doc.select("title").text();
-        logger.info("title: " + title);
+        PageInfoBean pageInfoBean=new PageInfoBean();
+        String title=response.title();
+
+        pageInfoBean.setUrl(response.location());
+
+        pageInfoBean.setTitle(title);
+
+
+        Elements keywords=doc.getElementsByTag("meta[name=keywords]");
+
+        keywords.forEach(kw -> {
+            String keyword=kw.attr("content");
+            pageInfoBean.setKeyword(keyword);
+            logger.info("关键词: "+ keyword);
+        });
+
+        Elements descs=doc.getElementsByTag("meta[name=description]");
+        descs.forEach(des -> {
+            String description=des.attr("content");
+            pageInfoBean.setDescription(description);
+            logger.info("描述: " + description);
+        });
+
+        pageInfoBean.setBody(doc.body().text());
+
+        pageInfoBean.setHtml(doc.body().html());
+
+        FileStorePipeline.exportExcel(pageInfoBean);
+
 
         // 添加新的url
         List<String> urls=doc.select("a").parallelStream().map(link -> link.attr("abs:href")).filter(link -> !link.trim().equals("")).collect(Collectors.toList());
@@ -53,7 +85,8 @@ public class PageAnalyzer implements Runnable {
             ExecutorTaskUtil.getInstance().execute(new Downloader(schdulerQueue));
         });
 
-        logger.info("---------"+schdulerQueue.hasRequest());
+
+        logger.debug("---------"+schdulerQueue.hasRequest());
 
 
 
