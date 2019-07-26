@@ -24,3 +24,10 @@
 
 >save_pipeline：对结果网页的保存
 
+
+
+#####启动
+
+Run.class
+
+设置好种子url即可
